@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang = "en">
+   <head></head>
+   <body>
+
+      <h3>
+         <a href = "{{ url_for('show_all') }}">Map the Movie Folder</a>
+      </h3>
+
+      <hr/>
+      {%- for message in get_flashed_messages() %}
+         {{ message }}
+      {%- endfor %}
+
+<table>
+{% for a in data %}
+   {% for b in a %}
+        Informazioni sul FILE: <br>
+        Home Path: {{b['Home path']}}
+        <br>
+        File Name: {{b['File Name']}}
+        <br>
+        Id: {{b['Id']}}
+        <br>
+        Atime: {{b['Atime']}}
+        <br>
+        Ctime: {{b['Ctime']}}
+        <br>
+        Size: {{b['Size']}}
+        <br>
+        Extension: {{b['Extension']}}
+        <br><br><br>
+
+
+        Informazioni sul FILM: <br>
+        Movie Id: {{b['Movie Id']}}
+        <br>
+        Movie Url: {{b['Movie Url']}}
+        <br>
+        Movie Title: {{b['Movie Title']}}
+        <br>
+        Movie Year: {{b['Movie Year']}}
+        <br>
+        Movie Plot: {{b['Movie Plot']}}
+        {% for actor in b['Actor List'] %}
+			Actor: {{actor['Name']}}<br>
+		{% endfor %}
+        <br><br><br>
+{% endfor %}
+   {% endfor %}
+</table>
+
+   </body>
+</html>
