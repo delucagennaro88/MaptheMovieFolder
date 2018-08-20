@@ -41,7 +41,10 @@
         <br>
         Movie Year: {{b['Movie Year']}}
         <br>
-        Movie Plot: {{b['Movie Plot']}}
+        Movie Plot: {{b['Movie Plot']}}<br>
+        {% for director in b['Director List'] %}
+			Director: {{director['Name']}}<br>
+		{% endfor %}
         {% for actor in b['Actor List'] %}
 			Actor: {{actor['Name']}}<br>
 		{% endfor %}
