@@ -1,8 +1,12 @@
-import os
 from flask import Flask, flash, url_for, redirect, render_template
 from json_manager import search_director, search_cast, open_json
-import sys, imdb
+import sys, imdb, os, json
 
+directory = "C:\\Users\\Utente\\Desktop\\FILM"
+json_directory = "C:\\Users\\Utente\\Dropbox\\Map the Movie"
+
+json_file = "attori_amati.json"
+json_actor_dir = os.path.join(json_directory, json_file)
 actor_dictionary = {}
 movie_dictionary = {}
 actor_collection = {}
@@ -10,18 +14,16 @@ actor_collection = {}
 ia = imdb.IMDb()
 
 def search_filmography(filmography):
-
     for a in filmography:
         for key, value in a.items():
-            alfa = 0
-            key_index = key #qui va salvato l'indice della categoria
+            key_index = str(key) #qui va salvato l'indice della categoria
             actor_dictionary[key_index] = []
             for b in value:
                 movie_film = ia.search_movie(str(b))
                 movie = movie_film[0]
                 title = movie.get('title')
                 movie_year = movie['year']
-                actor_dictionary[key_index].append({'Title': title, 'Year': movie_year})
+                actor_dictionary[key_index].append({'Title': title, 'Year': movie_year, 'Present': False})
     return actor_dictionary
 
 def attori_amati(actor_name):
@@ -39,15 +41,42 @@ def attori_amati(actor_name):
         dates = '(' + str(birth) + '-' + str(death) + ')'
 
         filmography = actor_identifier['filmography']
-
         filmography_box = search_filmography(filmography)
 
-        actor_collection[actor] = []
-        actor_collection[actor].append({'Nome': actor, 'Date': dates, 'Filmography': filmography_box})
+        actor_name = str(actor)
+        actor_collection[actor_name] = []
+        actor_collection[actor_name].append({ 'Date': dates, 'Filmography': filmography_box})
 
         #qui si verifica se il JSON esiste
         #se non esiste si crea e si scrive con W
         #se esiste si aggiorna col metodo inventato
+        if not os.path.exists(json_actor_dir):
+            with open(json_actor_dir, 'w') as outfile:
+                json.dump(actor_collection, outfile, sort_keys=True, indent=4, ensure_ascii=False)
+            print("Creato!")
+            return
+
+        else:
+            with open(json_actor_dir, 'r') as outfile:
+                data = json.load(outfile)
+
+            data_str = str(data)
+            no_brackets = data_str[data_str.find("{") + 1:data_str.rfind("}")]  # ora non è un dizionario, ma una stringa
+
+            # facciamo lo stesso con collection
+            collection_str = str(actor_collection)
+            no_brackets_coll = collection_str[collection_str.find("{") + 1:collection_str.rfind("}")]
+
+            # ora concateniamo le due stringhe
+            new_str = '{' + no_brackets + ', ' + no_brackets_coll + '}'
+
+            # qui ritorna dictionary
+            dict1 = eval(new_str)
+
+            with open(json_actor_dir, 'w') as outfile:
+                json.dump(dict1, outfile, indent=4, ensure_ascii=False)
+
+            print("Modificato!")
 
     except imdb.IMDbError as e:
         print("Probably you're not connected to Internet.  Complete error report:")
@@ -60,15 +89,12 @@ def attori_amati(actor_name):
 
     #print(type(filmography))
 
-attori_amati('Tina Pica')
+attori_amati('Titina De Filippo')
 
 
 
 
 '''
-json_directory = "C:\\Users\\Utente\\Dropbox\\Map the Movie"
-json_file = "cinema.json"
-json_dir = os.path.join(json_directory, json_file)
 
 app = Flask(__name__)
 
