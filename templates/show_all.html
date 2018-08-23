@@ -15,46 +15,20 @@
 <table>
 {% for a in data %}
    {% for b in a %}
-        Informazioni sul FILE: <br>
-        Home Path: {{b['Home path']}}
+        Name: {{b['Name']}}
         <br>
-        File Name: {{b['File Name']}}
+        Date: {{b['Date']}}
         <br>
-        Id: {{b['Id']}}
-        <br>
-        Atime: {{b['Atime']}}
-        <br>
-        Ctime: {{b['Ctime']}}
-        <br>
-        Size: {{b['Size']}}
-        <br>
-        Extension: {{b['Extension']}}
-        <br><br><br>
-
-
-        Informazioni sul FILM: <br>
-        Movie Id: {{b['Movie Id']}}
-        <br>
-        Movie Url: {{b['Movie Url']}}
-        <br>
-        Movie Title: {{b['Movie Title']}}
-        <br>
-        Movie Year: {{b['Movie Year']}}
-        <br>
-        Movie Plot: {{b['Movie Plot']}}<br>
-        {% for director in b['Director List'] %}
-			Director: {{director['Name']}}<br>
+        {% for c in b %}
+			{% for d in c %}
+			Film: {{d['Title']}}<br>
+		    {% endfor %}
 		{% endfor %}
-        {% for actor in b['Actor List'] %}
-			Actor: {{actor['Name']}}<br>
-		{% endfor %}
-        <br><br><br>
+
 {% endfor %}
    {% endfor %}
 
-        <form action = "{{ request.path }}" method = "post">
-            <input type = "submit" value = "Submit" />
-        </form>
+
 </table>
 
    </body>

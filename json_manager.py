@@ -2,6 +2,12 @@ import json
 
 movie_class = {}
 movie_dic = {}
+actor_class = {}
+filmography_dic = {}
+filmography_list = {}
+actor_list = []
+actor_super_class = {}
+film_class = {}
 
 def search_director(movie_list):
     directors = movie_list
@@ -26,6 +32,7 @@ def open_json(json_dir):
     with open(json_dir, encoding='cp1252') as data_file:
         movie_json = json.load(data_file)
         xx = 0
+
         for i in movie_json.values():
             for x in i:
                 home_path = x['Home Directory']
@@ -53,3 +60,29 @@ def open_json(json_dir):
                 xx+=1
 
         return movie_class
+
+def search_filmography(filmography):
+    films = filmography
+
+    for key, a in films.items():
+        key_index = key
+        filmography_dic[key_index] = []
+        for b in a:
+            title = b['Title']
+            id = b['Id']
+            year = b['Year']
+            present = b['Present']
+            filmography_dic[key_index].append({'Title': title, 'Id': id, 'Present': present, 'Year': year})
+
+    return filmography_dic
+
+film = {}
+def open_json_data(json_dir):
+    with open(json_dir, encoding='cp1252') as data_file:
+        movie_json = json.load(data_file)
+
+        for i, (key, value) in enumerate(movie_json.items()):
+            for a in value:
+                film[a['Name']] = []
+                film[a['Name']].append({'Name': a['Name'], 'Date': a['Date'], 'Filmography': a['Filmography']})
+        return film

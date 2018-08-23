@@ -1,14 +1,15 @@
 from flask import Flask, flash, url_for, redirect, render_template
-from json_manager import search_director, search_cast, open_json
-import sys, imdb, os, json
+from json_manager import search_director, search_cast, open_json, open_json_data
+import sys, imdb, os, json, time
 
 directory = "C:\\Users\\Utente\\Desktop\\FILM"
 json_directory = "C:\\Users\\Utente\\Dropbox\\Map the Movie"
 
+cinema_json_file = "cinema.json"
 json_file = "attori_amati.json"
 json_actor_dir = os.path.join(json_directory, json_file)
+cinema_json = os.path.join(json_directory, cinema_json_file)
 actor_dictionary = {}
-movie_dictionary = {}
 actor_collection = {}
 
 ia = imdb.IMDb()
@@ -18,12 +19,15 @@ def search_filmography(filmography):
         for key, value in a.items():
             key_index = str(key) #qui va salvato l'indice della categoria
             actor_dictionary[key_index] = []
+            time.sleep(5)
             for b in value:
                 movie_film = ia.search_movie(str(b))
                 movie = movie_film[0]
+                movie_id = movie.movieID
                 title = movie.get('title')
                 movie_year = movie['year']
-                actor_dictionary[key_index].append({'Title': title, 'Year': movie_year, 'Present': False})
+                actor_dictionary[key_index].append({'Title': title, 'Year': movie_year, 'Id': movie_id, 'Present': False})
+                time.sleep(5)
     return actor_dictionary
 
 def attori_amati(actor_name):
@@ -43,9 +47,9 @@ def attori_amati(actor_name):
         filmography = actor_identifier['filmography']
         filmography_box = search_filmography(filmography)
 
-        actor_name = str(actor)
-        actor_collection[actor_name] = []
-        actor_collection[actor_name].append({ 'Date': dates, 'Filmography': filmography_box})
+        actor_name_str = str(actor)
+        actor_collection[actor_name_str] = []
+        actor_collection[actor_name_str].append({'Name': actor_name_str, 'Date': dates, 'Filmography': filmography_box})
 
         #qui si verifica se il JSON esiste
         #se non esiste si crea e si scrive con W
@@ -87,18 +91,36 @@ def attori_amati(actor_name):
         print('It seems that there\'s no actor with "%s"' % actor)
         sys.exit(4)
 
-    #print(type(filmography))
 
-attori_amati('Titina De Filippo')
+#attori_amati('Tina Pica')
+
+def check_presence():
+    cinema_file = open_json(cinema_json)
+    attori_file = open_json_data(json_actor_dir)#Occorre creare una funzione apposita per aprire il File. OPEN_JSOn non va bene!
+
+    cinema_data = cinema_file.values()
+
+    for z in attori_file.values():
+        for w in z:
+            #print(w['Name'])
+            for y, (key, value) in enumerate(w['Filmography'].items()):
+                for x in value:
+                    for a in cinema_data:
+                        for b in a:
+                            if x['Id'] == b['Movie Id']:
+                                print(x['Title'])
+                                x['Present'] = True
+
+    with open(json_actor_dir, 'w') as outfile:
+        json.dump(attori_file, outfile, indent=4, ensure_ascii=False)
+
+#check_presence()
 
 
-
-
-'''
 
 app = Flask(__name__)
 
-data_collection = open_json(json_dir)
+data_collection = open_json_data(json_actor_dir)
 
 data = data_collection.values()
 
@@ -108,4 +130,3 @@ def show_all():
 
 if __name__ == '__main__':
     app.run(debug=True)
-'''
