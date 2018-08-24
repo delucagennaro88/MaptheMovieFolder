@@ -12,6 +12,20 @@
          {{ message }}
       {%- endfor %}
 
+<div>
+    {% block content %}
+    <h1>Cerca Nuovi Personaggi</h1>
+    <form action="{{ url_for('new') }}" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.actor_name.label }}<br>
+            {{ form.actor_name(size=32) }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}
+ </div>
+
 <table>
 {% for a in data %}
    {% for b in a %}

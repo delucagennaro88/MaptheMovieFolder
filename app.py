@@ -1,6 +1,10 @@
 from flask import Flask, flash, url_for, redirect, render_template
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms.validators import DataRequired
 from json_manager import search_director, search_cast, open_json, open_json_data
 import sys, imdb, os, json, time
+
 
 directory = "C:\\Users\\Utente\\Desktop\\FILM"
 json_directory = "C:\\Users\\Utente\\Dropbox\\Map the Movie"
@@ -12,8 +16,11 @@ cinema_json = os.path.join(json_directory, cinema_json_file)
 actor_dictionary = {}
 actor_collection = {}
 
-
 ia = imdb.IMDb()
+
+class ActorForm(FlaskForm):
+    actor_name = StringField('Personaggio', validators=[DataRequired()])
+    submit = SubmitField('Cerca')
 
 def search_filmography(filmography):
     for a in filmography:
@@ -50,10 +57,9 @@ def check_presence():
                                 print(x['Title'])
                                 x['Present'] = True
                                 change = True
-                            else:
-                                change = False
 
     if change == True:
+        print('Updated')
         with open(json_actor_dir, 'w') as outfile:
             json.dump(attori_file, outfile, indent=4, ensure_ascii=False)
     else:
@@ -70,9 +76,17 @@ def attori_amati(actor_name):
         actor_id = actor.personID
         actor_identifier = ia.get_person(actor_id)
 
-        birth = actor_identifier['birth date'][:4]
-        death = actor_identifier['death date'][:4]
-        dates = '(' + str(birth) + '-' + str(death) + ')'
+
+        for key, value in actor_identifier.items():
+            if key == "birth date":
+                birth = actor_identifier['birth date'][:4]
+                if key == "death date":
+                    death = actor_identifier['death date'][:4]
+                    dates = '(' + str(birth) + '-' + str(death) + ')'
+                else:
+                    dates = '(' + str(birth) + '-' + ')'
+            else:
+                dates = '(-)'
 
         filmography = actor_identifier['filmography']
         filmography_box = search_filmography(filmography)
@@ -138,6 +152,7 @@ def attori_amati(actor_name):
 
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'XMLZODSHE8N6NFOZDPZA2HULWSIYJU45K6N4ZO9M'
 
 if os.path.exists(json_actor_dir):
     check_presence()
@@ -147,9 +162,31 @@ if os.path.exists(json_actor_dir):
 else:
     data = {}
 
+
 @app.route('/')
 def show_all():
-    return render_template('attori_amati.html', data=data)
+    form = ActorForm()
+    return render_template('attori_amati.html', data=data, form=form)
+
+
+@app.route('/new', methods=['GET', 'POST'])
+def new():
+    form = ActorForm()
+
+    if form.validate_on_submit():
+        flash('Ricerca per {} effettuata'.format(form.actor_name.data))
+        attori_amati(form.actor_name.data)
+
+        if os.path.exists(json_actor_dir):
+            check_presence()
+            data_collection = open_json_data(json_actor_dir)
+            data = data_collection.values()
+
+        else:
+            data = {}
+
+    return render_template('attori_amati.html', title='Cerca', form=form, data=data)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
