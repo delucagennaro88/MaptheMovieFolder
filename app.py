@@ -11,6 +11,7 @@ json_actor_dir = os.path.join(json_directory, json_file)
 cinema_json = os.path.join(json_directory, cinema_json_file)
 actor_dictionary = {}
 actor_collection = {}
+change = False
 
 ia = imdb.IMDb()
 
@@ -29,6 +30,31 @@ def search_filmography(filmography):
                 actor_dictionary[key_index].append({'Title': title, 'Year': movie_year, 'Id': movie_id, 'Present': False})
                 time.sleep(5)
     return actor_dictionary
+
+
+def check_presence():
+    cinema_file = open_json(cinema_json)
+    attori_file = open_json_data(json_actor_dir)#Occorre creare una funzione apposita per aprire il File. OPEN_JSOn non va bene!
+
+    cinema_data = cinema_file.values()
+
+    for z in attori_file.values():
+        for w in z:
+            #print(w['Name'])
+            for y, (key, value) in enumerate(w['Filmography'].items()):
+                for x in value:
+                    for a in cinema_data:
+                        for b in a:
+                            if x['Id'] == b['Movie Id'] and x['Present'] == False:
+                                print(x['Title'])
+                                x['Present'] = True
+                                change = True
+    if change == True:
+        with open(json_actor_dir, 'w') as outfile:
+            json.dump(attori_file, outfile, indent=4, ensure_ascii=False)
+    else:
+        print("Non ci sono cambiamenti")
+        return
 
 def attori_amati(actor_name):
 #1. Dato il nome di un attore, restituisce l'elenco di tutti i suoi film (solo titoli e date)
@@ -58,6 +84,11 @@ def attori_amati(actor_name):
             with open(json_actor_dir, 'w') as outfile:
                 json.dump(actor_collection, outfile, sort_keys=True, indent=4, ensure_ascii=False)
             print("Creato!")
+
+            check_presence()
+
+            print("Aggiornato con le presenze")
+
             return
 
         else:
@@ -82,6 +113,10 @@ def attori_amati(actor_name):
 
             print("Modificato!")
 
+            check_presence()
+
+            print("Aggiornato con le presenze")
+
     except imdb.IMDbError as e:
         print("Probably you're not connected to Internet.  Complete error report:")
         print(e)
@@ -92,27 +127,7 @@ def attori_amati(actor_name):
         sys.exit(4)
 
 
-#attori_amati('Tina Pica')
-
-def check_presence():
-    cinema_file = open_json(cinema_json)
-    attori_file = open_json_data(json_actor_dir)#Occorre creare una funzione apposita per aprire il File. OPEN_JSOn non va bene!
-
-    cinema_data = cinema_file.values()
-
-    for z in attori_file.values():
-        for w in z:
-            #print(w['Name'])
-            for y, (key, value) in enumerate(w['Filmography'].items()):
-                for x in value:
-                    for a in cinema_data:
-                        for b in a:
-                            if x['Id'] == b['Movie Id']:
-                                print(x['Title'])
-                                x['Present'] = True
-
-    with open(json_actor_dir, 'w') as outfile:
-        json.dump(attori_file, outfile, indent=4, ensure_ascii=False)
+#attori_amati('Totò')
 
 #check_presence()
 
@@ -120,9 +135,13 @@ def check_presence():
 
 app = Flask(__name__)
 
-data_collection = open_json_data(json_actor_dir)
+if os.path.exists(json_actor_dir):
+    check_presence()
+    data_collection = open_json_data(json_actor_dir)
+    data = data_collection.values()
 
-data = data_collection.values()
+else:
+    data = {}
 
 @app.route('/')
 def show_all():

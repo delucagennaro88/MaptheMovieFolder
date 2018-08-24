@@ -19,14 +19,23 @@
         <br>
         Date: {{b['Date']}}
         <br>
-        {% for c in b %}
-			{% for d in c %}
-			Film: {{d['Title']}}<br>
-		    {% endfor %}
-		{% endfor %}
+
+        {% for key, value in b['Filmography'].items() %}
+
+            {% for c in value %}
+                Titolo: {{c['Title']}}
+                <br>
+                Year: {{c['Year']}}
+                <br>
+                Id: {{c['Id']}}
+                <br>
+                Present: {{c['Present']}}
+                <br>
+            {% endfor %}
 
 {% endfor %}
-   {% endfor %}
+    {% endfor %}
+        {% endfor %}
 
 
 </table>
