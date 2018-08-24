@@ -11,7 +11,7 @@ json_actor_dir = os.path.join(json_directory, json_file)
 cinema_json = os.path.join(json_directory, cinema_json_file)
 actor_dictionary = {}
 actor_collection = {}
-change = False
+
 
 ia = imdb.IMDb()
 
@@ -33,6 +33,7 @@ def search_filmography(filmography):
 
 
 def check_presence():
+    change = False
     cinema_file = open_json(cinema_json)
     attori_file = open_json_data(json_actor_dir)#Occorre creare una funzione apposita per aprire il File. OPEN_JSOn non va bene!
 
@@ -49,6 +50,9 @@ def check_presence():
                                 print(x['Title'])
                                 x['Present'] = True
                                 change = True
+                            else:
+                                change = False
+
     if change == True:
         with open(json_actor_dir, 'w') as outfile:
             json.dump(attori_file, outfile, indent=4, ensure_ascii=False)
@@ -145,7 +149,7 @@ else:
 
 @app.route('/')
 def show_all():
-    return render_template('show_all.html', data=data)
+    return render_template('attori_amati.html', data=data)
 
 if __name__ == '__main__':
     app.run(debug=True)

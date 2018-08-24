@@ -21,7 +21,7 @@
         <br>
 
         {% for key, value in b['Filmography'].items() %}
-
+                Key: {{key}}<br><br>
             {% for c in value %}
                 Titolo: {{c['Title']}}
                 <br>
@@ -30,7 +30,7 @@
                 Id: {{c['Id']}}
                 <br>
                 Present: {{c['Present']}}
-                <br>
+                <br><br><br>
             {% endfor %}
 
 {% endfor %}
