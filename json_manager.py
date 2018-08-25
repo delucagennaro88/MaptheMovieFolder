@@ -2,12 +2,7 @@ import json
 
 movie_class = {}
 movie_dic = {}
-actor_class = {}
 filmography_dic = {}
-filmography_list = {}
-actor_list = []
-actor_super_class = {}
-film_class = {}
 
 def search_director(movie_list):
     directors = movie_list
